@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html 
+      
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      >
+<head>
+<meta charset="utf-8"/>
+<title>Product Manager</title>
+
+</head>
+<body>
+
+<div style="margin-top:10%" align="center">
+		
+    <h1>Event List</h1>
+    <div sec:authorize="isAuthenticated()">
+			Welcome <b><span sec:authentication="name">Username</span></b> &nbsp;
+			<i><span sec:authentication="principal.authorities">Roles</span></i>
+	</div>
+		
+		<form th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+		
+		<div sec:authorize="hasAnyAuthority('ADMIN')">
+		 <a href="/new">Create New Event</a>
+		</div>
+   
+    <br/><br/>
+    <form th:action="@{/}">
+    Filter: <input type="text" name="keyword" id="keyword" size="50" th:value="${keyword}" required />
+    &nbsp;
+    <input type="submit" value="Search" />
+    &nbsp;
+    <input type="button" value="Clear" id="btnClear" onclick="clearSearch()" />
+   </form>
+   <script type="text/javascript">
+    function clearSearch() {
+        window.location = "[[@{/}]]";
+    }
+  </script>
+    
+    <br/><br/>
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Event ID</th>
+					<th>Nom</th>
+					<th>Description</th>
+					<th>Type</th>
+					<th>Nombre de places </th>
+					<th>Date</th>
+					<th>Localisation</th>
+					<th>Tarif</th>
+					<th sec:authorize="hasAnyAuthority('ADMIN','USER')">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+                   <tr th:each="event : ${listEvent}">
+  				   <td th:text="${event.idevent}">Event ID</td>
+					<td th:text="${event.nom}">Nom</td>
+					<td th:text="${event.description}">Description</td>
+					<td th:text="${event.type}">Type</td>
+					<td th:text="${event.nbplace}">Nombre de places </td>
+					<td th:text="${event.date}">Date</td>
+					<td th:text="${event.localisation}">Localisation</td>
+					<td th:text="${event.tarif}">Tarif</td>
+					
+                 <td sec:authorize="hasAnyAuthority('ADMIN','USER')">
+                    <div sec:authorize="hasAnyAuthority('ADMIN')">
+                    <a th:href="@{'/edit/' + ${event.idevent}}">Edit</a>
+                   </div> &nbsp;&nbsp;&nbsp;
+                   <div sec:authorize="hasAnyAuthority('ADMIN')">
+                    <a th:href="@{'/delete/' + ${event.idevent}}">Delete</a>
+                   </div> 
+                   <div sec:authorize="hasAnyAuthority('USER')">
+                    <a th:href="@{'/addreservation/' +${event.idevent}}">Reserver</a>
+                   </div> 
+                </td> 
+            </tr>
+        </tbody>
+    </table>
+</div>   
+</body>
+</html>
